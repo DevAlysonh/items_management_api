@@ -5,7 +5,7 @@ from uuid import UUID
 from app.api import app, get_items_from_order
 from app.schema import Item
 from fastapi.testclient import TestClient
-from app.exception import OrderNotFoundException
+from app.exception import OrderNotFoundException, InternalServerException
 
 @pytest.fixture
 def httpClient():
@@ -58,3 +58,8 @@ class TestGetOrders:
         override_get_items_from_order(items)
         resposta = httpClient.get("/orders/7e290683-d67b-4f96-a940-44bef1f69d21/items")
         assert resposta.json() == items
+
+    def test_quando_fonte_de_pedidos_falha_um_erro_deve_ser_retornado(self, httpClient, override_get_items_from_order):
+        override_get_items_from_order(InternalServerException())
+        resposta = httpClient.get("/orders/ea78b59b-885d-4e7b-9cd0-d54acadb4933/items")
+        assert resposta.status_code == HTTPStatus.BAD_GATEWAY
