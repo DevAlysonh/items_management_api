@@ -48,7 +48,7 @@ def recuperar_itens_por_pedido(identificacao_do_pedido: UUID) -> list[Item]:
     except httpx.HTTPStatusError as exc:
         # aqui poderiam ser tratados outros erros como autenticação
         if exc.response.status_code == HTTPStatus.NOT_FOUND:
-            raise PedidoNaoEncontradoError() from exc
+            raise InternalServerException() from exc
         raise exc
     except httpx.HTTPError as exc:
-        raise FalhaDeComunicacaoError() from exc
+        raise InternalServerException() from exc
